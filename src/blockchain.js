@@ -75,8 +75,14 @@ class Blockchain {
         // Set the height
         block.height = self.chain.length;
 
-        // Create the block hash
+        // Create the block hash (note that block.hash == null during SHA256 computation)
         block.hash = SHA256(JSON.stringify(block)).toString();
+
+        const status = await block.validate();
+        if (!status) {
+          reject(new Error("Unable to add block because it is invalid"));
+          return;
+        }
 
         // add the block to the blockchain
         self.chain.push(block);
@@ -241,13 +247,20 @@ class Blockchain {
     let self = this;
     let errorLog = [];
     return new Promise(async (resolve, reject) => {
+      const validationPromises = [];
       for (let i = 0; i < self.chain.length; i++) {
         const block = self.chain[i];
-        const status = block.validate();
-        if (!status) {
+        validationPromises.push(block.validate()); // aggregate the promises
+      }
+
+      const results = await Promise.all(validationPromises);
+      results.forEach(outcome => {
+        if (!outcome) {
           errorLog.push(`Block '${block.hash}' failed validation`);
         }
+      });
 
+      for (let i = 0; i < self.chain.length; i++) {
         if (i > 0) {
           const previousBlock = self.chain[i - 1];
           if (block.previousBlockHash !== previousBlock.hash) {
@@ -258,7 +271,7 @@ class Blockchain {
         }
       }
       resolve(errorLog);
-    });
+    })  ;
   }
 }
 

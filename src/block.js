@@ -26,7 +26,7 @@
      /**
       *  validate() method will validate if the block has been tampered or not.
       *  Been tampered means that someone from outside the application tried to change
-      *  values in the block data as a consecuence the hash of the block should be different.
+      *  values in the block data as a consequence the hash of the block should be different.
       *  Steps:
       *  1. Return a new promise to allow the method be called asynchronous.
       *  2. Save the in auxiliary variable the current hash of the block (`this` represent the block object)
@@ -39,15 +39,18 @@
          let self = this;
          return new Promise((resolve, reject) => {
              // Save in auxiliary variable the current block hash
-             const currentHash = self.hash;
+             const blockHash = self.hash;
                                              
              // Recalculate the hash of the Block
+             self.hash = null; // N.B: block.hash == null as at the time the SHA256 hash was determined, so make provision for this
              const computedHash = SHA256(JSON.stringify(self)).toString();
+
+             self.hash = blockHash; // reset back to auxiliary value
  
              // Comparing if the hashes changed
              // Returning the Block is not valid
              // Returning the Block is valid
-             resolve(currentHash === computedHash);
+             resolve(blockHash === computedHash);
          });
      }
  
