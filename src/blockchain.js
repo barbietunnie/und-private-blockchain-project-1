@@ -243,8 +243,6 @@ class Blockchain {
     return new Promise(async (resolve, reject) => {
       for (let i = 0; i < self.chain.length; i++) {
         const block = self.chain[i];
-        prevBlockHash = block.previousBlockHash;
-
         const status = block.validate();
         if (!status) {
           errorLog.push(`Block '${block.hash}' failed validation`);
@@ -259,6 +257,7 @@ class Blockchain {
           }
         }
       }
+      resolve(errorLog);
     });
   }
 }
