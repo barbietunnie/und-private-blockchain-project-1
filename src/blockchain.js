@@ -167,12 +167,18 @@
       * Search on the chain array for the block that has the hash.
       * @param {*} hash 
       */
-     getBlockByHash(hash) {
-         let self = this;
-         return new Promise((resolve, reject) => {
-            
-         });
-     }
+      getBlockByHash(hash) {
+        let self = this;
+        return new Promise((resolve, reject) => {
+           const result = self.chain.filter(block => block.hash === hash);
+           if (result.length > 0) {
+               resolve(result[0]);
+               return;
+           }
+
+           reject('No hash was found with the specified hash');
+        });
+    }
  
      /**
       * This method will return a Promise that will resolve with the Block object 
