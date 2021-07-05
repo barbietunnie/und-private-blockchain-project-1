@@ -113,6 +113,7 @@
       * will allow users to register a new Block with the star object
       * into the chain. This method will resolve with the Block added or
       * reject with an error.
+      * 
       * Algorithm steps:
       * 1. Get the time from the message sent as a parameter example: `parseInt(message.split(':')[1])`
       * 2. Get the current time: `let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));`
@@ -120,17 +121,45 @@
       * 4. Veify the message with wallet address and signature: `bitcoinMessage.verify(message, address, signature)`
       * 5. Create the block and add it to the chain
       * 6. Resolve with the block added.
+      * 
       * @param {*} address 
       * @param {*} message 
       * @param {*} signature 
       * @param {*} star 
       */
-     submitStar(address, message, signature, star) {
-         let self = this;
-         return new Promise(async (resolve, reject) => {
-             
-         });
-     }
+      submitStar(address, message, signature, star) {
+        let self = this;
+        return new Promise(async (resolve, reject) => {
+            try {
+               const tokens = message.split(':');
+               let time = tokens[1]; // might throw an exception, however this will be caught by the error handler
+               time = parseInt(time);
+
+               // Get the current time
+               let currentTime = new Date().getTime().toString().slice(0, -3);
+               const timeLimit = 5 * 60; // 5 minutes
+
+               if (currentTime - time > timeLimit) {
+                   console.error(`Time limit exceeded: ${currentTime - time}s`);
+                   reject('Cannot verify message as the time limit is exceeded');
+                   return;
+               }
+               
+               const status = bitcoinMessage.verify(message, address, signature);
+               if (!status) {
+                   reject("Message verification failed");
+                   return;
+               }
+
+               const block = new BlockClass.Block({star, address});
+               await self._addBlock(block);
+               resolve(block);
+            } catch(err) {
+                reject(`Unable to register block with star object. Details: ${err.message}`);
+            }
+            
+        });
+    }
  
      /**
       * This method will return a Promise that will resolve with the Block
