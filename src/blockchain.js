@@ -100,11 +100,13 @@
       * The method return a Promise that will resolve with the message to be signed
       * @param {*} address 
       */
-     requestMessageOwnershipVerification(address) {
-         return new Promise((resolve) => {
-             
-         });
-     }
+      requestMessageOwnershipVerification(address) {
+        return new Promise((resolve) => {
+            const currentTime = new Date().getTime().toString().slice(0, -3);
+            const message = `${address}:${currentTime}:starRegistry`;
+            resolve(message);
+        });
+    }
  
      /**
       * The submitStar(address, message, signature, star) method
