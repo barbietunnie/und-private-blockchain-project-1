@@ -230,14 +230,28 @@
       * 1. You should validate each block using `validateBlock`
       * 2. Each Block should check the with the previousBlockHash
       */
-     validateChain() {
-         let self = this;
-         let errorLog = [];
-         return new Promise(async (resolve, reject) => {
-             
-         });
-     }
- 
+      validateChain() {
+        let self = this;
+        let errorLog = [];
+        return new Promise(async (resolve, reject) => {
+            for (let i = 0; i < self.chain.length; i++) {
+                const block = self.chain[i];
+                prevBlockHash = block.previousBlockHash;
+
+                const status = block.validate();
+                if (!status) {
+                    errorLog.push(`Block '${block.hash}' failed validation`);
+                }
+
+                if (i > 0) {
+                    const previousBlock = self.chain[i - 1];
+                    if (block.previousBlockHash !== previousBlock.hash) {
+                       errorLog.push(`Broken chain - "${block.hash}" previous block hash is invalid`);
+                    }
+                }
+            }
+        });
+    }
  }
  
  module.exports.Blockchain = Blockchain;   
