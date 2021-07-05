@@ -203,13 +203,26 @@
       * Remember the star should be returned decoded.
       * @param {*} address 
       */
-     getStarsByWalletAddress (address) {
-         let self = this;
-         let stars = [];
-         return new Promise((resolve, reject) => {
-             
-         });
-     }
+      getStarsByWalletAddress (address) {
+        let self = this;
+        let stars = [];
+        return new Promise((resolve, reject) => {
+            self.chain.filter(async block => {
+                try {
+                   const data = await block.getBData();
+                   const blockAddr = data.address;
+                   if (blockAddr && blockAddr === address) {
+                       stars.push(data.star);
+                   }
+                } catch(err) {
+                    console.error(err);
+                }
+            });
+
+            // return the list of stars found
+            resolve(stars);
+        });
+    }
  
      /**
       * This method will return a Promise that will resolve with the list of errors when validating the chain.
