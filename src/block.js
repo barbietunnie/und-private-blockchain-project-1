@@ -72,8 +72,10 @@
              // Parse the data to an object to be retrieve.
              const decodedObj = JSON.parse(decodedStr);
  
-             if(decodedObj.height === 0)
-                 reject("Unable to provide data for genesis block");
+             if(decodedObj.height === 0){
+                 reject(new Error("Genesis block - nothing to return"));
+                 return;
+            }
  
              resolve(decodedObj);
          });
