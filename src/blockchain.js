@@ -64,6 +64,13 @@ class Blockchain {
     let self = this;
     return new Promise(async (resolve, reject) => {
       try {
+        // validate the blockchain before any block addition
+        const errors = await self.validateChain();
+        if (errors.length > 0) {
+          console.error(errors);
+          throw new Error("Unable to add block as chain is invalid");
+        }
+        
         // Set the previous block hash if height > -1
         if (self.height > -1) {
           block.previousBlockHash = self.chain[self.chain.length - 1].hash;
