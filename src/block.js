@@ -42,10 +42,9 @@
              const blockHash = self.hash;
                                              
              // Recalculate the hash of the Block
-             self.hash = null; // N.B: block.hash == null as at the time the SHA256 hash was determined, so make provision for this
-             const computedHash = SHA256(JSON.stringify(self)).toString();
-
-             self.hash = blockHash; // reset back to auxiliary value
+             
+             // N.B: block.hash == null as at the time the SHA256 hash was determined, so make provision for this
+             const computedHash = SHA256(JSON.stringify({...self, hash: null})).toString();
  
              // Comparing if the hashes changed
              // Returning the Block is not valid
